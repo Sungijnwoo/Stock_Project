@@ -3,7 +3,7 @@ from selenium.webdriver.common.keys import Keys
 import time
 import urllib.request
 
-driver = webdriver.Chrome()
+driver = webdriver.Chrome(r"D:\4_1\Stock_Project\Crawling\selenium\chromedriver.exe")
 driver.get("https://www.google.co.kr/imghp?hl=ko&ogbl")
 elem = driver.find_element_by_name("q")
 elem.send_keys("박규영")
