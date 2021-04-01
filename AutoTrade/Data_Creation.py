@@ -27,8 +27,8 @@ objStockChart.SetInputValue(0, "A" + Stock_name)   #종목 코드 - 아주IB투�
 objStockChart.SetInputValue(1, ord('2')) # 개수로 조회
 objStockChart.SetInputValue(4, Stock_len) # 하루 381개 0900 ~ 1520
 objStockChart.SetInputValue(5, [0,1,2,3,4,5, 8,9]) #날짜,시간,시가,고가,저가,종가,거래량,거래대금
-objStockChart.SetInputValue(6, ord('D')) # '차트 주가 - 일간 차트 요청
-#objStockChart.SetInputValue(7, Stock_bong)
+objStockChart.SetInputValue(6, ord('m')) # '차트 주가 - 일간 차트 요청
+objStockChart.SetInputValue(7, Stock_bong)
 objStockChart.SetInputValue(9, ord('1')) # 수정주가 사용
 objStockChart.BlockRequest()
  
@@ -83,6 +83,6 @@ df2['ema120'] = df['close'].ewm(120).mean()
 
 
 folder_path = os.getcwd()
-df.to_excel('SamSung_data.xlsx')
-df2.to_excel('SamSung_moving_average.xlsx')
+df.to_excel('test_data.xlsx')
+# df2.to_excel('SamSung_moving_average.xlsx')
 os.startfile(folder_path)
