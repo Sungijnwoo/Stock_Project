@@ -14,12 +14,12 @@ codeList = objCpCodeMgr.GetStockListByMarket(1) #거래소
 codeList2 = objCpCodeMgr.GetStockListByMarket(2) #코스닥
  
  
-# print("거래소 종목코드", len(codeList))
-# for i, code in enumerate(codeList):
-#     secondCode = objCpCodeMgr.GetStockSectionKind(code)
-#     name = objCpCodeMgr.CodeToName(code)
-#     stdPrice = objCpCodeMgr.GetStockStdPrice(code)
-#     print(i, code, secondCode, stdPrice, name)
+print("거래소 종목코드", len(codeList))
+for i, code in enumerate(codeList):
+    secondCode = objCpCodeMgr.GetStockSectionKind(code)
+    name = objCpCodeMgr.CodeToName(code)
+    stdPrice = objCpCodeMgr.GetStockStdPrice(code)
+    print(i, code, secondCode, stdPrice, name)
  
 print("코스닥 종목코드", len(codeList2))
 for i, code in enumerate(codeList2):

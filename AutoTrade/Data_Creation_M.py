@@ -21,6 +21,8 @@ if (bConnect == 0):
 
 Stock_name = input("차트 조회 종목코드 입력 : ")
 Stock_len = input("조회할 차트 수 입력 : ")
+#toDate = input("마지막날짜 : ")
+#fromDate = input("시작날짜 : ")
 Stock_bong = input("조회할 차트 분봉 종류 : ")
 # 차트 객체 구하기
 objStockChart = win32com.client.Dispatch("CpSysDib.StockChart")
@@ -31,26 +33,20 @@ objStockChart.SetInputValue(1, ord('2')) # 개수로 조회
 #objStockChart.SetInputValue(3, fromDate) # 위 1,2,3은 기간별 조회시 사용
 objStockChart.SetInputValue(4, Stock_len) # 하루 381개 0900 ~ 1520
 objStockChart.SetInputValue(5, [0,1,2,3,4,5,6, 8,9]) #날짜,시간,시가,고가,저가,종가,전일대비,거래량,거래대금
-objStockChart.SetInputValue(6, ord('m')) # '차트 주가 - 일간 차트 요청
+objStockChart.SetInputValue(6, ord('m'))
 objStockChart.SetInputValue(7, Stock_bong)
 objStockChart.SetInputValue(9, ord('1')) # 수정주가 사용
 objStockChart.BlockRequest()
  
 len = objStockChart.GetHeaderValue(3)
+#len = int(Stock_len)
+print(len)
  
 print("날짜","시간", "시가", "고가", "저가", "종가", "거래량","거래대금")
 print("빼기빼기==============================================-")
 
 for i in range(len):
-    # day = objStockChart.GetDataValue(0, i)
-    # time = objStockChart.GetDataValue(1, i)
-    # open = objStockChart.GetDataValue(2, i)
-    # high = objStockChart.GetDataValue(3, i)
-    # low = objStockChart.GetDataValue(4, i)
-    # close = objStockChart.GetDataValue(5, i)
-    # vol = objStockChart.GetDataValue(6, i)
-    # amount = objStockChart.GetDataValue(7, i)
-    # print (day, time, open, high, low, close, vol,amount)
+
 
     day_list.append(objStockChart.GetDataValue(0, i))
     time_list.append(objStockChart.GetDataValue(1, i))
@@ -66,10 +62,10 @@ dict1 = {'day' : day_list, 'time' : time_list, 'open' : open_list, 'high' : high
 
 df = pd.DataFrame(dict1, columns=['day','time','open','high','low','close','compare','vol','amount'])
 df.sort_index(ascending=False)
-#print(df)
+print(df)
 
 #df2 =pd.DataFrame(index=range(0,Stock_len), columns=['mov5','ema5','mov10','ema10','mov20','ema20','mov60','ema60','mov120','ema120'])
-df2 =pd.DataFrame(index=range(0,int(Stock_len)), columns=['blank'])
+df2 =pd.DataFrame(index=range(0,df.shape[0]), columns=['blank'])
 df2 = df2.drop(['blank'], axis = 1)
 #print(df2)
 
@@ -83,11 +79,11 @@ df2['mov60'] = df['close'].rolling(60).mean()
 df2['ema60'] = df['close'].ewm(60).mean()
 df2['mov120'] = df['close'].rolling(120).mean()
 df2['ema120'] = df['close'].ewm(120).mean()
-#print(df2)
+print(df2)
 
 
 
-folder_path = os.getcwd()
-df.to_excel('test_data.xlsx')
-# df2.to_excel('SamSung_moving_average.xlsx')
-os.startfile(folder_path)
+# folder_path = os.getcwd()
+# df.to_excel('IB_data_Minute.xlsx')
+# df2.to_excel('IB_moving_average_Minute.xlsx')
+# os.startfile(folder_path)
