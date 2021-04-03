@@ -2,7 +2,6 @@ import sys, os
 import requests
 import selenium
 from selenium import webdriver
-import requests
 import pandas as pd
 from bs4 import BeautifulSoup
 import re
@@ -25,7 +24,7 @@ def crawling_main_text(url):
     soup = BeautifulSoup(req.text, 'html.parser')
     
     # 연합뉴스
-    if ('://yna' in url) | ('app.yonhapnews' in url): 
+    if ('yna' in url) | ('app.yonhapnews' in url): 
         main_article = soup.find('article', {'class':'story-news article'})
         if main_article == None:
             main_article = soup.find('article', {'class' : 'article-txt'})
@@ -33,6 +32,7 @@ def crawling_main_text(url):
         text = main_article.text
         time = soup.find('p', {'class' : 'update-time'}).text
         # time = time[4:14]
+
     elif 'econonews' in url:
         text = soup.find('div', {'class' : 'cont-body'}).text
         time = soup.find('span', {'class' : 'info'}).text
@@ -43,16 +43,28 @@ def crawling_main_text(url):
         time = soup.find('span', {'class' : 'date'}).text
         # time = time[:8]
     
-    elif 'sedaily.com' in url:
+    elif 'sedaily' in url:
         text = soup.find('div', {'class' : 'article_view'}).text
         time = soup.find('span', {'class' : 'url_txt'}).text
         # time = time[2:12]
-    
-    elif 'mrepublic.co.kr' in url:
+
+    elif 'edaily' in url:
+        text = soup.find('div', {'class' : 'news_body'}).text
+        time = soup.find('span', {'class' : 'dates'}).text
+
+    elif 'mrepublic' in url:
         text = soup.find('div', {'class' : 'article-body'}).text
         time = soup.find('ul', {'class' : 'information'}).text
         # time = time[4:14]
     
+    elif 'gukjenews' in url:
+        text = soup.find('div', {'class' : 'article-body'}).text
+        time = soup.find('ul', {'class' : 'information'}).text
+
+    elif 'heraldcorp' in url:
+        text = soup.find('div', {'id' : 'articleText'}).text
+        time = soup.find('li', {'class' : 'article_date'}).text
+
     elif 'moneys.mt' in url:
         text = soup.find('div', {'id' : 'article'}).text
         time = soup.find('span', {'class' : 'num'}).text
@@ -110,6 +122,22 @@ def crawling_main_text(url):
         text = soup.find('div', {'id' : 'textBody'}).text
         time = soup.find('li', {'class' : 'date'}).text
 
+    elif 'ajunews' in url:
+        text = soup.find('div', {'id' : 'articleBody'}).text
+        time = soup.find('span', {'class' : 'date'}).text
+
+    elif 'pinpointnews' in url:
+        text = soup.find('div', {'class' : 'vc_con'}).text
+        time = soup.find('p', {'class' : 'w1'}).text
+
+    elif 'pinpointnews' in url:
+        text = soup.find('div', {'class' : 'vc_con'}).text
+        time = soup.find('p', {'class' : 'w1'}).text
+
+    elif 'm-i' in url:
+        text = soup.find('div', {'id' : 'article-view-content-div'}).text
+        time = soup.find('div', {'class' : 'info-text'}).text
+
     # MBC 
     elif '//imnews.imbc' in url: 
         text = soup.find('div', {'itemprop' : 'articleBody'}).text
@@ -135,11 +163,13 @@ def crawling_main_text(url):
         text = main_article.text
         time = soup.find('span', {'class' : 'date'}).text
         time = time[3:14]
+
     # KBS
     elif 'news.kbs' in url:
         text = soup.find('div', {'id' : 'cont_newstext'}).text
         time = soup.find('em', {'class': 'date'}).text
         time = time[3:13]
+    
     # JTBC
     elif 'news.jtbc' in url:
         text = soup.find('div', {'class' : 'article_content'}).text
@@ -162,17 +192,23 @@ def crawling_main_text(url):
 # ############### 브라우저를 켜고 검색 키워드 입력 ####################
 data = pd.read_excel("code_KOSDAQ.xlsx")
 queries = data.loc[:, "name"]
+queries = ["아주ib투자", "한화솔루션", "녹십자렙셀", "흥국에프엔비", "현대바이오", 
+            "그린뉴딜", "오성첨단소재", "동국알앤에스", "한네트", "케이씨티",
+            "아이크래프트", "이수앱지스", "HMM", "구영테크", "신성델타테크",
+            "두산인프라코어", "바이넥스", "진양산업", "우리기술투자", "라온시큐어",
+            "알로이스", "케이씨티"]
 news_num = int(input('수집 뉴스의 수(숫자만 입력) : '))
 
 print('\n' + '=' * 100 + '\n')
 
 print('브라우저를 실행시킵니다(자동 제어)\n')
-browser = webdriver.Chrome(r"D:\naver_news_crawling\chromedriver.exe")
+browser = webdriver.Chrome(r"C:\git-project\Stock_Project\naver_news_crawling\chromedriver.exe")
 print('\n크롤링을 시작합니다.')
 
 news_dict = {}
 idx = 1
 pbar = tqdm(total=news_num * len(queries))
+
 for query in queries:
     cnt = 1
     news_url = 'https://search.naver.com/search.naver?where=news&query={}'.format(query)
@@ -188,7 +224,7 @@ for query in queries:
         li_list = table.find_elements_by_xpath('./li[contains(@id, "sp_nws")]')
         area_list = [li.find_element_by_xpath('.//div[@class="news_area"]') for li in li_list]
         a_list = [area.find_element_by_xpath('.//a[@class="news_tit"]') for area in area_list]
-        for n in a_list[:min(len(a_list), news_num-cnt+1)]:
+        for n in a_list:
             try:
                 n_url = n.get_attribute('href')
                 content, date = crawling_main_text(n_url)
@@ -201,15 +237,19 @@ for query in queries:
                 idx += 1
                 cnt += 1
                 pbar.update(1)
+                if cnt == news_num + 1:
+                    break
             except:
                 pass
         
         if cnt < news_num+1:
             cur_page +=1
-
-            pages = browser.find_element_by_xpath('//div[@class="sc_page_inner"]')
-            next_page_url = [p for p in pages.find_elements_by_xpath('.//a') if p.text == str(cur_page)][0].get_attribute('href')
-
+            try:
+                pages = browser.find_element_by_xpath('//div[@class="sc_page_inner"]')
+                next_page_url = [p for p in pages.find_elements_by_xpath('.//a') if p.text == str(cur_page)][0].get_attribute('href')
+            except:
+                time.sleep(0.7)
+                break
             browser.get(next_page_url)
             time.sleep(sleep_sec)
         else:            
