@@ -8,7 +8,7 @@ import re
 from datetime import datetime
 import pickle, progressbar, json, glob, time
 from tqdm import tqdm
-
+from selenium.webdriver.common.keys import Keys
 ###### 날짜 저장 ##########
 
 
@@ -19,12 +19,15 @@ sleep_sec = 0.5
 print('본문 크롤링에 필요한 함수를 로딩하고 있습니다...\n' + '-' * 100)
 
 def crawling_main_text(url):
-    req = requests.get(url)
-    req.encoding = None
+    try:
+        req = requests.get(url=url, timeout = 3)
+    except:
+        return None
+    # req.encoding = None
     soup = BeautifulSoup(req.text, 'html.parser')
     
     # 연합뉴스
-    if ('yna' in url) | ('app.yonhapnews' in url): 
+    if ('yna' in url) | ('app.yonhapnews' in url):
         main_article = soup.find('article', {'class':'story-news article'})
         if main_article == None:
             main_article = soup.find('article', {'class' : 'article-txt'})
@@ -48,18 +51,18 @@ def crawling_main_text(url):
         time = soup.find('span', {'class' : 'url_txt'}).text
         # time = time[2:12]
 
-    elif 'edaily' in url:
+    elif 'edaily' in url: 
         text = soup.find('div', {'class' : 'news_body'}).text
-        time = soup.find('span', {'class' : 'dates'}).text
+        time = soup.find('div', {'class' : 'dates'}).text
 
     elif 'mrepublic' in url:
         text = soup.find('div', {'class' : 'article-body'}).text
-        time = soup.find('ul', {'class' : 'information'}).text
+        time = soup.find('div', {'class' : 'info-group'}).text
         # time = time[4:14]
     
     elif 'gukjenews' in url:
         text = soup.find('div', {'class' : 'article-body'}).text
-        time = soup.find('ul', {'class' : 'information'}).text
+        time = soup.find('div', {'class' : 'info-group'}).text
 
     elif 'heraldcorp' in url:
         text = soup.find('div', {'id' : 'articleText'}).text
@@ -86,7 +89,7 @@ def crawling_main_text(url):
         text = soup.find('article', {'id' : 'article-view-content-div'}).text
         time = soup.find('ul', {'class' : 'infomation'}).text
 
-    elif 'news1.kr' in url:
+    elif 'news1.kr' in url: 
         text = soup.find('div', {'class' : 'detail sa_area'}).text
         time = soup.find('ul', {'class' : 'article_info'}).text
 
@@ -96,7 +99,7 @@ def crawling_main_text(url):
 
     elif 'hankyung' in url:
         text = soup.find('div', {'id' : 'articletxt'}).text
-        time = soup.find('span', {'class' : 'num'}).text
+        time = soup.find('div', {'class' : 'date_info'}).text
     
     elif 'fntoday' in url:
         text = soup.find('div', {'id' : 'article-view-content-div'}).text
@@ -111,7 +114,7 @@ def crawling_main_text(url):
         time = soup.find('i', {'class' : 'icon-clock-o'}).text
 
     elif 'fnnews' in url:
-        text = soup.find('div', {'class' : 'article_content'}).text
+        text = soup.find('div', {'id' : 'article_content'}).text
         time = soup.find('div', {'class' : 'byline'}).text
 
     elif 'biz.chosun' in url:
@@ -120,7 +123,7 @@ def crawling_main_text(url):
     
     elif 'news.mt' in url:
         text = soup.find('div', {'id' : 'textBody'}).text
-        time = soup.find('li', {'class' : 'date'}).text
+        time = soup.find('div', {'class' : 'info'}).text
 
     elif 'ajunews' in url:
         text = soup.find('div', {'id' : 'articleBody'}).text
@@ -162,25 +165,25 @@ def crawling_main_text(url):
             main_article = soup.find('div', {'class' : 'article_cont_area'})
         text = main_article.text
         time = soup.find('span', {'class' : 'date'}).text
-        time = time[3:14]
+        # time = time[3:14]
 
     # KBS
     elif 'news.kbs' in url:
         text = soup.find('div', {'id' : 'cont_newstext'}).text
         time = soup.find('em', {'class': 'date'}).text
-        time = time[3:13]
+        # time = time[3:13]
     
     # JTBC
     elif 'news.jtbc' in url:
         text = soup.find('div', {'class' : 'article_content'}).text
         time = soup.find('span', {'class': 'i_date'}).text
-        time = time[3:13]
+        # time = time[3:13]
         
     # 그 외
     else:
         text = None
         time = None
-    
+
     return text.replace('\n','').replace('\r','').replace('<br>','').replace('\t',''), time.replace('/', '').replace('-','').replace('.','')
     
 # press_list = ['MBC']
@@ -192,25 +195,22 @@ def crawling_main_text(url):
 # ############### 브라우저를 켜고 검색 키워드 입력 ####################
 data = pd.read_excel("code_KOSDAQ.xlsx")
 queries = data.loc[:, "name"]
-queries = ["아주ib투자", "한화솔루션", "녹십자렙셀", "흥국에프엔비", "현대바이오", 
-            "그린뉴딜", "오성첨단소재", "동국알앤에스", "한네트", "케이씨티",
-            "아이크래프트", "이수앱지스", "HMM", "구영테크", "신성델타테크",
-            "두산인프라코어", "바이넥스", "진양산업", "우리기술투자", "라온시큐어",
+queries = ["두산인프라코어", "바이넥스", "진양산업", "우리기술투자", "라온시큐어",
             "알로이스", "케이씨티"]
 news_num = int(input('수집 뉴스의 수(숫자만 입력) : '))
 
 print('\n' + '=' * 100 + '\n')
 
 print('브라우저를 실행시킵니다(자동 제어)\n')
-browser = webdriver.Chrome(r"C:\git-project\Stock_Project\naver_news_crawling\chromedriver.exe")
+browser = webdriver.Chrome(r"G:\git_stock\Stock_Project\naver_news_crawling\chromedriver.exe")
 print('\n크롤링을 시작합니다.')
 
-news_dict = {}
-idx = 1
-pbar = tqdm(total=news_num * len(queries))
 
 for query in queries:
-    cnt = 1
+    news_dict = {}
+    print(query + ' 추출중')
+    pbar = tqdm(total=news_num)
+    idx = 0
     news_url = 'https://search.naver.com/search.naver?where=news&query={}'.format(query)
     browser.get(news_url)
     time.sleep(2)
@@ -233,47 +233,49 @@ for query in queries:
                                 'url' : n_url,
                                 'time' : date,
                                 'text' : content}
-                
                 idx += 1
-                cnt += 1
                 pbar.update(1)
-                if cnt == news_num + 1:
+                if idx == news_num:
                     break
             except:
                 pass
         
-        if cnt < news_num+1:
+        if idx < news_num:
             cur_page +=1
             try:
-                pages = browser.find_element_by_xpath('//div[@class="sc_page_inner"]')
-                next_page_url = [p for p in pages.find_elements_by_xpath('.//a') if p.text == str(cur_page)][0].get_attribute('href')
+                elem = browser.find_element_by_class_name('btn_next')
+                elem.send_keys(Keys.RETURN)
             except:
-                time.sleep(0.7)
                 break
-            browser.get(next_page_url)
+            # try:
+            #     pages = browser.find_element_by_xpath('//div[@class="sc_page_inner"]')
+            #     next_page_url = [p for p in pages.find_elements_by_xpath('.//a') if p.text == str(cur_page)][0].get_attribute('href')
+            # except:
+            #     time.sleep(2)
+            #     break
+            # browser.get(next_page_url)
             time.sleep(sleep_sec)
+
         else:            
             # print('\n브라우저를 종료합니다.\n' + '=' * 100)
-            time.sleep(0.7)
+            time.sleep(2)
             # browser.close()
             break
 
-pbar.close()
+    pbar.close()
 
 #### 데이터 전처리하기 ###################################################### 
 
-print('데이터프레임 변환\n')
-news_df = pd.DataFrame(news_dict).T
+    print('데이터프레임 변환\n')
+    news_df = pd.DataFrame(news_dict).T
 
-folder_path = os.getcwd()
-xlsx_file_name = '네이버뉴스_본문_{}개_{}.xlsx'.format(news_num * len(queries), query)
-xlsx_file_name = "네이버뉴스크롤링.xlsx"
+    folder_path = os.getcwd()
+    xlsx_file_name = '네이버뉴스_본문_{}개_{}.xlsx'.format(news_num, query)
+    news_df.to_excel(xlsx_file_name)
 
-news_df.to_excel(xlsx_file_name)
+    print('엑셀 저장 완료 | 경로 : {}\\{}\n'.format(folder_path, xlsx_file_name))
 
-print('엑셀 저장 완료 | 경로 : {}\\{}\n'.format(folder_path, xlsx_file_name))
+    os.startfile(folder_path)
 
-os.startfile(folder_path)
-
-print('=' * 100 + '\n결과물의 일부')
-news_df
+    print('=' * 100 + '\n결과물의 일부')
+    news_df
