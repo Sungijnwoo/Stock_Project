@@ -76,9 +76,19 @@ for x,j in enumerate(Stock_code):
     dict1 = {'day' : day_list, 'time' : time_list, 'open' : open_list, 'high' : high_list, 'low' : low_list, \
     'close' : close_list,'compare' : compare_list, 'vol' : vol_list, 'amount' : amount_list}
 
+
     df = pd.DataFrame(dict1, columns=['day','time','open','high','low','close','compare','vol','amount'])
     df.sort_index(ascending=False)
     print(df)
+    day_list = []
+    time_list = []
+    open_list = []
+    high_list = []
+    low_list = []
+    close_list = []
+    compare_list = []
+    vol_list = []
+    amount_list = []
 
     #df2 =pd.DataFrame(index=range(0,Stock_len), columns=['mov5','ema5','mov10','ema10','mov20','ema20','mov60','ema60','mov120','ema120'])
     df2 =pd.DataFrame(index=range(0,df.shape[0]), columns=['blank'])
