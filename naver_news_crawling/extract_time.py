@@ -22,19 +22,19 @@ news = ["라온시큐어", "알로이스"]
 
 for new in news:
     a = pd.read_excel("네이버뉴스_본문_1000개_{}.xlsx".format(new))
-    idx_num_l = []
-    for x, i in enumerate(a['time']):
-        try:
-            if not i.isdigit():
-                idx_num_l += x,
-        except:
-            pass
-    a = a.drop(idx_num_l)
+    # idx_num_l = []
+    # for x, i in enumerate(a['time']):
+    #     try:
+    #         if not i.isdigit():
+    #             idx_num_l += x,
+    #     except:
+    #         pass
+    # a = a.drop(idx_num_l)
             
-    folder_path = os.getcwd()
-    xlsx_file_name = '네이버뉴스_본문_1000개_{}.xlsx'.format(new)
-    a.to_excel(xlsx_file_name, index=False)
+    # folder_path = os.getcwd()
+    # xlsx_file_name = '네이버뉴스_본문_1000개_{}.xlsx'.format(new)
+    # a.to_excel(xlsx_file_name, index=False)
 
-    print('엑셀 저장 완료 | 경로 : {}\\{}\n'.format(folder_path, xlsx_file_name))
+    # print('엑셀 저장 완료 | 경로 : {}\\{}\n'.format(folder_path, xlsx_file_name))
 
-    os.startfile(folder_path)
+    # os.startfile(folder_path)
