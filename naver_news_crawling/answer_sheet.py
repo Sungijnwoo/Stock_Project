@@ -34,7 +34,8 @@ for x, y in zip(df['company'], df['time']):
         df_y_label.append(np.nan)
         continue
     # print(today_high, yesterday_close)
-    df_y_label.append((today_high - yesterday_close) / yesterday_close * 100)
+    df_y_label.append((today_high - yesterday_close) / yesterday_close * 100
+    )
 
 
 
