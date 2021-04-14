@@ -70,7 +70,7 @@ for x,i in enumerate(df['text']):
   if len(i) < 100: idx.append(x)
 df = df.drop(idx)
 
-vectorizer = CountVectorizer(analyzer = 'word', # 캐릭터 단위로 벡터화 할 수도 있습니다.
+text_vectorizer = CountVectorizer(analyzer = 'word', # 캐릭터 단위로 벡터화 할 수도 있습니다.
                              tokenizer = None, # 토크나이저를 따로 지정해 줄 수도 있습니다.
                              preprocessor = None, # 전처리 도구
                              stop_words = None, # 불용어 nltk등의 도구를 사용할 수도 있습니다.
@@ -79,11 +79,20 @@ vectorizer = CountVectorizer(analyzer = 'word', # 캐릭터 단위로 벡터화 
                              max_features = 2500 # 만들 피처의 수, 단어의 수가 됩니다.
                             )
 
-title_train_feature_vector = vectorizer.fit_transform(df['title'])
-text_train_feature_vector = vectorizer.fit_transform(df['text'])
+title_vectorizer = CountVectorizer(analyzer = 'word', # 캐릭터 단위로 벡터화 할 수도 있습니다.
+                             tokenizer = None, # 토크나이저를 따로 지정해 줄 수도 있습니다.
+                             preprocessor = None, # 전처리 도구
+                             stop_words = None, # 불용어 nltk등의 도구를 사용할 수도 있습니다.
+                             min_df = 2, # 토큰이 나타날 최소 문서 개수로 오타나 자주 나오지 않는 특수한 전문용어 제거에 좋습니다. 
+                             ngram_range=(1, 3), # BOW의 단위를 1~3개로 지정합니다.
+                             max_features = 2500 # 만들 피처의 수, 단어의 수가 됩니다.
+                            )
 
-joblib.dump(title_train_feature_vector, 'title_train_feature_vector.pkl')
-joblib.dump(text_train_feature_vector, 'text_train_feature_vector.pkl')
+title_train_feature_vector = title_vectorizer.fit_transform(df['title'])
+text_train_feature_vector = text_vectorizer.fit_transform(df['text'])
+
+joblib.dump(title_vectorizer, 'title_vectorizer.pkl')
+joblib.dump(text_vectorizer, 'text_vectorizer.pkl')
 
 title_transformer = TfidfTransformer(smooth_idf=False)
 text_transformer = TfidfTransformer(smooth_idf=False)

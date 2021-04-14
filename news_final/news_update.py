@@ -18,12 +18,9 @@ text_model = joblib.load('text_model.pkl')
 title_model = joblib.load('title_model.pkl') 
 text_tdif = joblib.load('text_transformer.pkl')
 title_tdif = joblib.load('title_transformer.pkl')
-text_cv = joblib.load('text_train_feature_vector.pkl') 
-title_cv = joblib.load('title_train_feature_vector.pkl') 
+text_cv = joblib.load('text_vectorizer.pkl') 
+title_cv = joblib.load('title_vectorizer.pkl') 
 
-# with open('text_train_feature_vector.pkl', 'rb') as f:  # cv.pkl이라는 파일을 바이너리 읽기(rb)모드로 열어서 f라 하고
-    
-# with open('title_train_feature_vector.pkl', 'rb') as f:  # cv.pkl이라는 파일을 바이너리 읽기(rb)모드로 열어서 f라 하고
     
 
 print('브라우저를 실행시킵니다(자동 제어)\n')
@@ -49,6 +46,7 @@ while True:
         search_opt_box = browser.find_element_by_xpath('//*[@id="main_pack"]/div[1]/div[1]/a[2]')
         search_opt_box.click()
 
+
         table = browser.find_element_by_xpath('//ul[@class="list_news"]')
         li_list = table.find_elements_by_xpath('./li[contains(@id, "sp_nws")]')
         area_list = [li.find_element_by_xpath('.//div[@class="news_area"]') for li in li_list]
@@ -56,17 +54,18 @@ while True:
         n = a_list[0]
         n_url = n.get_attribute('href')
         if past_url[i] != n_url:
-            print("{} 새로운 뉴스 발견".format(interest_news[i]))
+            print("{}시 {}분 {} 새로운 뉴스 발견".format(datetime.now().hour, datetime.now().minute, interest_news[i]))
             past_url[i] = n_url
-            title = n.get_attribute('title')
+            title = [n.get_attribute('title')]
             print(":", title)
-            # input = title_cv.transform(title)
-            # input = title_tdif.transform(input)
-            # output = title_model.predict(input)
-            # if output == 1:
-            #     print("{} 주식 무조건 오름".format(interest_news[i]))
-            # else:
-            #     print("{} 주식 무조건 떨어짐".format(interest_news[i]))
+            input = title_cv.transform(title)
+            input = title_tdif.transform(input)
+            output = title_model.predict(input)
+            if output == 1:
+                print("{} 주식 무조건 오름".format(interest_news[i]))
+            else:
+                print("{} 주식 무조건 떨어짐".format(interest_news[i]))
+            print("")
         browser.refresh()
     cnt += 1
     if cnt == 100:
