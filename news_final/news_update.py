@@ -11,7 +11,7 @@ from sklearn.feature_extraction.text import CountVectorizer
 from selenium.webdriver.common.keys import Keys
 from sklearn.ensemble import RandomForestClassifier
 import joblib
-interest_news = ["두산인프라코어", "아주ib투자", "한화솔루션", "동국알앤에스"]
+interest_news = ["스푸트니크", "아주ib투자", "한화솔루션", "동국알앤에스"]
 past_url = ['', '', '', '']
 
 text_model = joblib.load('text_model.pkl') 
@@ -43,7 +43,7 @@ while True:
     for i in range(len(interest_news)):
         browser.switch_to_window(tabs[i])
 
-        search_opt_box = browser.find_element_by_xpath('//*[@id="main_pack"]/div[1]/div[1]/a[2]')
+        search_opt_box = browser.find_element_by_xpath('//*[@id="snb"]/div[1]/div/div[1]/a[2]')
         search_opt_box.click()
 
 
