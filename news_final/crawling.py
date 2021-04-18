@@ -191,93 +191,93 @@ def crawling_main_text(url):
 
 # print('검색할 언론사 : {} | {}개 \n'.format(press_list, len(press_list)))
 
+if __name__ == "__main__":
+    # ############### 브라우저를 켜고 검색 키워드 입력 ####################
+    queries = ["이재명", "윤석열", "정세균", "크래프톤", "야놀자", "카카오뱅크", "리디북스", "두나무", "2차전지", "백신여권", 
+            "CMO", "스푸트니크", "디지털화폐", "OTT", "메타버스", "미중갈등"]
+    news_num = int(input('수집 뉴스의 수(숫자만 입력) : '))
+    news_dict = {}
+    idx = 0
 
-# ############### 브라우저를 켜고 검색 키워드 입력 ####################
-queries = ["이재명", "윤석열", "정세균", "크래프톤", "야놀자", "카카오뱅크", "리디북스", "두나무", "2차전지", "백신여권", 
-           "CMO", "스푸트니크", "디지털화폐", "OTT", "메타버스", "미중갈등"]
-news_num = int(input('수집 뉴스의 수(숫자만 입력) : '))
-news_dict = {}
-idx = 0
+    print('\n' + '=' * 100 + '\n')
+    print('브라우저를 실행시킵니다(자동 제어)\n')
+    browser = webdriver.Chrome(r"D:\4_1\Stock_Project\naver_news_crawling\chromedriver.exe")
+    print('\n크롤링을 시작합니다.')
+    pbar = tqdm(total=news_num * len(queries))
 
-print('\n' + '=' * 100 + '\n')
-print('브라우저를 실행시킵니다(자동 제어)\n')
-browser = webdriver.Chrome(r"D:\4_1\Stock_Project\naver_news_crawling\chromedriver.exe")
-print('\n크롤링을 시작합니다.')
-pbar = tqdm(total=news_num * len(queries))
-
-for query in queries:
-    news_cnt = 0
-    print(query + ' 추출중')
-    
-    
-    news_url = 'https://search.naver.com/search.naver?where=news&query={}'.format(query)
-    browser.get(news_url)
-    search_opt_box = browser.find_element_by_xpath('//*[@id="main_pack"]/div[1]/div[1]/a[2]')
-    search_opt_box.click()
-    time.sleep(2)
-
-    ################ 뉴스 크롤링 ########################
-    # ####동적 제어로 페이지 넘어가며 크롤링
-    cur_page = 1     
-
-    while cur_page < 400:
-        table = browser.find_element_by_xpath('//ul[@class="list_news"]')
-        li_list = table.find_elements_by_xpath('./li[contains(@id, "sp_nws")]')
-        area_list = [li.find_element_by_xpath('.//div[@class="news_area"]') for li in li_list]
-        a_list = [area.find_element_by_xpath('.//a[@class="news_tit"]') for area in area_list]
-        for n in a_list:
-            try:
-                n_url = n.get_attribute('href')
-                content, date = crawling_main_text(n_url)
-                news_dict[idx] = {'company' : query, 
-                                'title' : n.get_attribute('title'), 
-                                'url' : n_url,
-                                'time' : date,
-                                'text' : content}
-                idx += 1
-                news_cnt += 1
-                pbar.update(1)
-                if news_cnt == news_num:
-                    break
-            except:
-                pass
+    for query in queries:
+        news_cnt = 0
+        print(query + ' 추출중')
         
-        if news_cnt < news_num:
-            cur_page +=1
-            try:
-                elem = browser.find_element_by_class_name('btn_next')
-                elem.send_keys(Keys.RETURN)
-            except:
+        
+        news_url = 'https://search.naver.com/search.naver?where=news&query={}'.format(query)
+        browser.get(news_url)
+        search_opt_box = browser.find_element_by_xpath('//*[@id="main_pack"]/div[1]/div[1]/a[2]')
+        search_opt_box.click()
+        time.sleep(2)
+
+        ################ 뉴스 크롤링 ########################
+        # ####동적 제어로 페이지 넘어가며 크롤링
+        cur_page = 1     
+
+        while cur_page < 400:
+            table = browser.find_element_by_xpath('//ul[@class="list_news"]')
+            li_list = table.find_elements_by_xpath('./li[contains(@id, "sp_nws")]')
+            area_list = [li.find_element_by_xpath('.//div[@class="news_area"]') for li in li_list]
+            a_list = [area.find_element_by_xpath('.//a[@class="news_tit"]') for area in area_list]
+            for n in a_list:
+                try:
+                    n_url = n.get_attribute('href')
+                    content, date = crawling_main_text(n_url)
+                    news_dict[idx] = {'company' : query, 
+                                    'title' : n.get_attribute('title'), 
+                                    'url' : n_url,
+                                    'time' : date,
+                                    'text' : content}
+                    idx += 1
+                    news_cnt += 1
+                    pbar.update(1)
+                    if news_cnt == news_num:
+                        break
+                except:
+                    pass
+            
+            if news_cnt < news_num:
+                cur_page +=1
+                try:
+                    elem = browser.find_element_by_class_name('btn_next')
+                    elem.send_keys(Keys.RETURN)
+                except:
+                    break
+                # try:
+                #     pages = browser.find_element_by_xpath('//div[@class="sc_page_inner"]')
+                #     next_page_url = [p for p in pages.find_elements_by_xpath('.//a') if p.text == str(cur_page)][0].get_attribute('href')
+                # except:
+                #     time.sleep(2)
+                #     break
+                # browser.get(next_page_url)
+                time.sleep(sleep_sec)
+
+            else:            
+                # print('\n브라우저를 종료합니다.\n' + '=' * 100)
+                time.sleep(2)
+                # browser.close()
                 break
-            # try:
-            #     pages = browser.find_element_by_xpath('//div[@class="sc_page_inner"]')
-            #     next_page_url = [p for p in pages.find_elements_by_xpath('.//a') if p.text == str(cur_page)][0].get_attribute('href')
-            # except:
-            #     time.sleep(2)
-            #     break
-            # browser.get(next_page_url)
-            time.sleep(sleep_sec)
 
-        else:            
-            # print('\n브라우저를 종료합니다.\n' + '=' * 100)
-            time.sleep(2)
-            # browser.close()
-            break
+    pbar.close()
 
-pbar.close()
+    #### 데이터 전처리하기 ###################################################### 
 
-#### 데이터 전처리하기 ###################################################### 
+    print('데이터프레임 변환\n')
+    news_df = pd.DataFrame(news_dict).T
 
-print('데이터프레임 변환\n')
-news_df = pd.DataFrame(news_dict).T
+    folder_path = os.getcwd()
+    xlsx_file_name = '네이버뉴스_본문_{}개_{}.xlsx'.format(news_num, query)
+    news_df.to_excel(xlsx_file_name)
 
-folder_path = os.getcwd()
-xlsx_file_name = '네이버뉴스_본문_{}개_{}.xlsx'.format(news_num, query)
-news_df.to_excel(xlsx_file_name)
+    print('엑셀 저장 완료 | 경로 : {}\\{}\n'.format(folder_path, xlsx_file_name))
 
-print('엑셀 저장 완료 | 경로 : {}\\{}\n'.format(folder_path, xlsx_file_name))
+    os.startfile(folder_path)
 
-os.startfile(folder_path)
-
-print('=' * 100 + '\n결과물의 일부')
-news_df
+    print('=' * 100 + '\n결과물의 일부')
+    news_df

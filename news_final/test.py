@@ -1,3 +1,4 @@
-import datetime
-today = datetime.datetime.strptime(str(datetime.datetime.now()), "%Y%m%d").date()
 
+a =('newsbotsedailycom저작권자', 'newsbotsedailycom', 'naver', 'moneysmtcokr라이브리 작성을 활성화해주세요', 'moneysmtcokr라이브리 작성을', 'moneysmtcokr라이브리', 'liveretoday 주요뉴스임상아 남편', 'liveretoday 주요뉴스임상아','liveretoday','gc녹십자랩셀', 'did', 'fnrassi 저작권자 파이낸셜뉴스', 'fnrassi 저작권자','fnrassi','gc녹십자랩셀 아티바', 'gc녹십자셀', 'gc녹십자랩셀 차세대', '흥국에프엔비한국전자홀딩스', '흥국에프엔비한국전자홀딩스 상승세', 'dicc', 'dicc소송', 'did', 'dsc인베스트먼트', 'dsc인베스트먼트 vi', 'dsc인베스트먼트 상승폭', 'dsc인베스트먼트 상승폭 확대', 'fnrassi', 'fnrassi 라온시큐어 신고가', 'fnrassi 라온시큐어 오르며', 'fnrassi 라온시큐어 전일대비', 'fnrassi 바이넥스', 'fnrassi 바이넥스 신고가', 'fnrassi 신성델타테크', '흥국에프엔비 라온시큐어 갤럭시아머니트리', '흥국에프엔비 라온시큐어', '흥국에프엔비', '흥국에프엔비한국전자홀딩스 상승세')
+
+print(a[0])

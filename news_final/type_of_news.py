@@ -16,7 +16,7 @@ type_of_news = {
 import pandas as pd
 import os
 import datetime
-import holidays
+# import holidays
 import numpy as np
 
 news = []
