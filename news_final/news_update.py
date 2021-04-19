@@ -31,7 +31,7 @@ def dbgout(message):
     strbuf = datetime.now().strftime('[%m/%d %H:%M:%S] ') + message
     post_message(myToken,"#stock", strbuf)
 
-interest_news = ["스푸트니크", "정세균", "윤석열", "이재명", "백신여권", "코로나", "기아차"]
+interest_news = ["이재명", "윤석열", "진단키트", "오세훈", "코로나", "스푸트니크", "CMO", "반도체", "2차전지", "미중갈등", "희토류", "조바이든 저탄소", "이트론"]
 past_url = ['' for i in interest_news]
 
 text_model = joblib.load(r'C:\git-project\Stock_Project\news_final\models\text_model.pkl') 
@@ -94,25 +94,25 @@ while True:
             title_input = title_cv.transform(title)
             title_input = title_tdif.transform(title_input)
             title_output = title_model.predict_proba(title_input)
-            # dbgout("{} 관련 뉴스 제목 : {}".format(interest_news[i], title))
+            dbgout("{} 관련 뉴스 제목 : {}".format(interest_news[i], title))
             print("title proba", title_output)
 
-            try:
-                text, date = crawling_main_text(n_url)
-                text = [preprocessing(text)]
-                text[0] = remove_stopwords(text[0])
-                text_input = text_cv.transform(text)
-                text_input = text_tdif.transform(text_input)
-                text_output = text_model.predict_proba(text_input)
-                # dbgout("{} 관련 뉴스 내용 : {}".format(interest_news[i], text))
-                print("text proba", text_output)
-            except:
-                pass           
+            # try:
+            #     text, date = crawling_main_text(n_url)
+            #     text = [preprocessing(text)]
+            #     text[0] = remove_stopwords(text[0])
+            #     text_input = text_cv.transform(text)
+            #     text_input = text_tdif.transform(text_input)
+            #     text_output = text_model.predict_proba(text_input)
+            #     dbgout("{} 관련 뉴스 내용 : {}".format(interest_news[i], text))
+            #     print("text proba", text_output)
+            # except:
+            #     pass           
             
         browser.refresh()
-    cnt += 1
-    if cnt == 100:
-        break
+    # cnt += 1
+    # if cnt == 100:
+    #     break
     
 
         
