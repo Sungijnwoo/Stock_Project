@@ -89,7 +89,7 @@ for i, c in enumerate(codeList):
         break
 
     code.append(c)
-    time.append(objStockChart.GetDataValue(1, i))
+    time.append(objStockChart.GetDataValue(1, 0))
     base.append(objStockChart.GetDataValue(2, 0))
     vol.append(objStockMst.GetHeaderValue(18))
     totOffer.append(objStockMst.GetHeaderValue(71))
@@ -187,7 +187,7 @@ for i, c in enumerate(codeList):
         break
 
     code.append(c)
-    time.append(objStockChart.GetDataValue(1, i))
+    time.append(objStockChart.GetDataValue(1, 0))
     base.append(objStockChart.GetDataValue(2, 0))
     vol.append(objStockMst.GetHeaderValue(18))
     totOffer.append(objStockMst.GetHeaderValue(71))
