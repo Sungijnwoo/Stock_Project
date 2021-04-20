@@ -46,25 +46,25 @@ for x,j in enumerate(Stock_code):
     vol_list = []
     amount_list = []
     
-    for i in range(leng):
+    # for i in range(leng):
 
-        open_list.append(objStockChart.GetDataValue(2, i))
-        high_list.append(objStockChart.GetDataValue(3, i))
-        low_list.append(objStockChart.GetDataValue(4, i))
-        close_list.append(objStockChart.GetDataValue(5, i))
-        vol_list.append(objStockChart.GetDataValue(6, i))
-        amount_list.append(objStockChart.GetDataValue(7, i))
+    open_list.append(objStockChart.GetDataValue(2, 0))
+    high_list.append(objStockChart.GetDataValue(3, 0))
+    low_list.append(objStockChart.GetDataValue(4, 0))
+    close_list.append(objStockChart.GetDataValue(5, 0))
+    vol_list.append(objStockChart.GetDataValue(6, 0))
+    amount_list.append(objStockChart.GetDataValue(7, 0))
     dict1 = {'open' : open_list, 'high' : high_list, 'low' : low_list, \
     'close' : close_list,'vol' : vol_list, 'amount' : amount_list}
 
 
     df = pd.DataFrame(dict1, columns=['open','high','low','close','vol','amount'])
     df.sort_index(ascending=False)
-    #print(df)
+    print(df)
 
     #코스닥 조회
 
-    kda_open,kda_high,kda_low,kda_close,kda_amount,kda_close_move,kda_amount_move,price_moving_tmp, amount_moving_tmp = [],[],[],[],[],[],[],[],[]
+    kda_open,kda_high,kda_low,kda_close,kda_vol,kda_close_move,kda_vol_move,price_moving_tmp, vol_moving_tmp = [],[],[],[],[],[],[],[],[]
 
     objStockChart.SetInputValue(0, 'U201') 
     objStockChart.SetInputValue(1, ord('2')) # 개수로 조회
@@ -79,28 +79,28 @@ for x,j in enumerate(Stock_code):
     kda_open.append(objStockChart.GetDataValue(2, 0))
     kda_high.append(objStockChart.GetDataValue(3, 0))
     kda_low.append(objStockChart.GetDataValue(4, 0))
-    kda_close.append(objStockChart.GetDataValue(5, 0))
-    kda_amount.append(objStockChart.GetDataValue(7, 0))
+    kda_close.append(objStockChart.GetDataValue(5, 20))
+    kda_vol.append(objStockChart.GetDataValue(6, 20)/1000)
 
     for j in move_num:
         for i in range(j):
             kda_close_move.append(objStockChart.GetDataValue(5, i))
-            kda_amount_move.append(objStockChart.GetDataValue(7, i))
+            kda_vol_move.append(objStockChart.GetDataValue(6, i)/1000)
 
         kda_close_numpy = np.array(kda_close_move)
-        kda_amount_numpy = np.array(kda_amount_move)
+        kda_vol_numpy = np.array(kda_vol_move)
         price_moving_tmp += int(np.mean(kda_close_numpy)),
-        amount_moving_tmp += int(np.mean(kda_amount_numpy)),
+        vol_moving_tmp += int(np.mean(kda_vol_numpy)),
         
-        kda_close_move, kda_amount_move= [], []
+        kda_close_move, kda_vol_move= [], []
 
     # feature_list = ['price_5_moving','price_20_moving','price_60_moving','price_120_moving','amount_5_moving','amount_20_moving','amount_60_moving','amount_120_moving']
     # tmp_list = price_moving_tmp + amount_moving_tmp
-    feature_list = ['kda_amount_5_moving','kda_amount_20_moving','kda_amount_60_moving','kda_amount_120_moving']
-    tmp_list = amount_moving_tmp
+    feature_list = ['kda_vol_5_moving','kda_vol_20_moving','kda_vol_60_moving','kda_vol_120_moving']
+    tmp_list = vol_moving_tmp
 
-    name_list1 = ['kda_open','kda_high','kda_low','kda_close','kda_amount']
-    value_list1 = [kda_open,kda_high,kda_low,kda_close,kda_amount]
+    name_list1 = ['kda_open','kda_high','kda_low','kda_close','kda_vol']
+    value_list1 = [kda_open,kda_high,kda_low,kda_close,kda_vol]
 
 
     for x,i in enumerate(tmp_list):
@@ -111,7 +111,7 @@ for x,j in enumerate(Stock_code):
 
     #코스피 조회
 
-    ksi_open,ksi_high,ksi_low,ksi_close,ksi_amount,ksi_close_move,ksi_amount_move,price_moving_tmp, amount_moving_tmp = [],[],[],[],[],[],[],[],[]
+    ksi_open,ksi_high,ksi_low,ksi_close,ksi_vol,ksi_close_move,ksi_vol_move,price_moving_tmp, vol_moving_tmp = [],[],[],[],[],[],[],[],[]
 
     objStockChart.SetInputValue(0, 'U001') 
     objStockChart.SetInputValue(1, ord('2')) # 개수로 조회
@@ -127,27 +127,32 @@ for x,j in enumerate(Stock_code):
     ksi_high.append(objStockChart.GetDataValue(3, 0))
     ksi_low.append(objStockChart.GetDataValue(4, 0))
     ksi_close.append(objStockChart.GetDataValue(5, 0))
-    ksi_amount.append(objStockChart.GetDataValue(7, 0))
+    ksi_vol.append(objStockChart.GetDataValue(6, 0)/1000)
 
     for j in move_num:
         for i in range(j):
             ksi_close_move.append(objStockChart.GetDataValue(5, i))
-            ksi_amount_move.append(objStockChart.GetDataValue(7, i))
+            ksi_vol_move.append(objStockChart.GetDataValue(6, i)/1000)
+    
+
 
         ksi_close_numpy = np.array(ksi_close_move)
-        ksi_amount_numpy = np.array(ksi_amount_move)
+        ksi_vol_numpy = np.array(ksi_vol_move)
         price_moving_tmp += int(np.mean(ksi_close_numpy)),
-        amount_moving_tmp += int(np.mean(ksi_amount_numpy)),
+        vol_moving_tmp += int(np.mean(ksi_vol_numpy)),
         
-        ksi_close_move, ksi_amount_move= [], []
+        ksi_close_move, ksi_vol_move= [], []
 
-    # feature_list = ['price_5_moving','price_20_moving','price_60_moving','price_120_moving','amount_5_moving','amount_20_moving','amount_60_moving','amount_120_moving']
-    # tmp_list = price_moving_tmp + amount_moving_tmp
-    feature_list = ['ksi_amount_5_moving','ksi_amount_20_moving','ksi_amount_60_moving','ksi_amount_120_moving']
-    tmp_list = amount_moving_tmp
 
-    name_list2 = ['ksi_open','ksi_high','ksi_low','ksi_close','ksi_amount']
-    value_list2 = [ksi_open,ksi_high,ksi_low,ksi_close,ksi_amount]
+
+    # feature_list = ['price_5_moving','price_20_moving','price_60_moving','price_120_moving','vol_5_moving','vol_20_moving','vol_60_moving','vol_120_moving']
+    # tmp_list = price_moving_tmp + vol_moving_tmp
+    feature_list = ['ksi_vol_5_moving','ksi_vol_20_moving','ksi_vol_60_moving','ksi_vol_120_moving']
+    tmp_list = vol_moving_tmp
+
+
+    name_list2 = ['ksi_open','ksi_high','ksi_low','ksi_close','ksi_vol']
+    value_list2 = [ksi_open,ksi_high,ksi_low,ksi_close,ksi_vol]
 
 
     for x,i in enumerate(tmp_list):
